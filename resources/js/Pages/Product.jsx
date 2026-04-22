@@ -1,0 +1,41 @@
+import React from 'react'
+import NavMenu from '../components/Header/nav'
+import { useConfig } from '@/Hooks/useConfig';
+export default function Product({ products }) {
+  const translations = useConfig();
+  const translation_product = translations.get('translations.product');
+
+  return (
+     <div className="">
+        <NavMenu />
+
+                <div className="max-w-4xl mx-auto my-10 bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div className="w-full">
+                       <div>
+                            <label className='font-bold text-center text-3xl py-5 block'>{translation_product.title}</label>
+                       </div>
+                        <div className="">
+                            <ul className="list-disc grid grid-cols-3 gap-6 p-6">
+                                {
+                                    products.map((product) => (
+                                        <li key={product.id} className='list-none'>
+                                            <div>
+                                                <div className="w-full h-[100px] bg-gray-100 rounded-xl flex flex-col items-center justify-center mb-4">
+                                                   <label>{product.id}</label>
+                                                </div>
+                                                <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
+                                                <p className="text-sm mb-1">{translation_product.Price}: ${product.price}</p>
+                                                <p className="text-sm mb-1">{translation_product.description}: {product.description}</p>
+                                            </div>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+
+    </div>
+  )
+}
