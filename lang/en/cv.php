@@ -37,5 +37,6 @@ return [
             "name" => "Can Tho University",
             "major" => "Information Technology"
         ],
-    ]
+    ],
+
 ];

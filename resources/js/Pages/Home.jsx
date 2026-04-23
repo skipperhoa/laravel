@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { useConfig } from '@/Hooks/useConfig';
+import { useConfig } from '@/hooks/useConfig';
 import { usePage } from '@inertiajs/react';
 import avatar from "@/assets/images/avatar.jpg";
 import { router } from '@inertiajs/react';
-import NavMenu from '../components/Header/nav';
+import NavMenu from '../components/ui/app-nav';
+import  useCartStore  from '@/stores/cartStore';
 export default function Home({ message }) {
+
    const setting = useConfig();
    const [lang,setLang] = useState(setting.get('config')['app.locale'] || 'en');
    console.log('setting', setting.get('translations'));

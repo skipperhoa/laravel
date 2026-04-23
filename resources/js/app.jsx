@@ -5,8 +5,8 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 
 createInertiaApp({
  resolve: name => {
-        const pages = import.meta.glob('./Pages/**/*.jsx')
-        return pages[`./Pages/${name}.jsx`]()
+        const pages = import.meta.glob('./pages/**/*.jsx')
+        return pages[`./pages/${name}.jsx`]()
     },
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />)

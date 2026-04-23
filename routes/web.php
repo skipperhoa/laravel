@@ -34,6 +34,10 @@ Route::get('/products', function () {
          'products' => $data,
      ]);
 });
+
+Route::get('/cart', function () {
+    return Inertia::render('Cart');
+});
 Route::post('language', LanguageController::class);
 
 Route::get('/test', function () {
