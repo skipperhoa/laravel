@@ -18,7 +18,18 @@ class ProductController extends Controller
         $products = \App\Models\Product::with(['languages' => function ($query) use ($lang) {
             $query->where('language_code', $lang);
         }])->get();
-        return response()->json($products);
+
+        $data = [];
+        foreach ($products as $product) {
+            $data[] = [
+                'id' => $product->id,
+                'title' => $product->languages->first()->pivot->name ?? null,
+                'description' => $product->languages->first()->pivot->description ?? null,
+                'price' => $product->price,
+                'sku' => $product->sku,
+            ];
+        }
+        return response()->json($data);
     }
 
     /**

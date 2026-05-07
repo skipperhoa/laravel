@@ -30,9 +30,6 @@ export default function Home({ message }) {
             <NavMenu />
 
             <div className="max-w-4xl mx-auto my-10 bg-white shadow-lg rounded-lg overflow-hidden">
-
-
-
                 <div className="grid grid-cols-3 gap-6 p-6">
 
 

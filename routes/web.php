@@ -38,7 +38,7 @@ Route::get('/products', function () {
 Route::get('/cart', function () {
     return Inertia::render('Cart');
 });
-Route::post('language', LanguageController::class);
+Route::post('languages', LanguageController::class);
 
 Route::get('/test', function () {
     $lng = app()->getLocale();
