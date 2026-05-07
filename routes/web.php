@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
-use \App\Http\Controllers\Api\LanguageController;
+use Illuminate\Http\Request;
 /* Route::get('/', function () {
     return view('welcome');
 }); */
@@ -38,7 +38,17 @@ Route::get('/products', function () {
 Route::get('/cart', function () {
     return Inertia::render('Cart');
 });
-Route::post('languages', LanguageController::class);
+Route::post('languages', function(Request $request){
+        $locale = $request->input('lang');
+
+        if (in_array($locale, config('app.supported_locales'))) {
+            session(['locale' => $locale]);
+        }else{
+            $locale = $request->getPreferredLanguage(['en', 'vi']) ?? config('app.locale');
+        }
+
+        return back(); // 👈 QUAN TRỌNG, Khi dùng kit React  + Inertia
+});
 
 Route::get('/test', function () {
     $lng = app()->getLocale();

@@ -16,7 +16,7 @@ export default function NavMenu() {
         const lang = e.target.value;
             setLang(lang);
 
-            router.post('/language', { lang }, {
+            router.post('/languages', { lang }, {
                 preserveScroll: true,
                 preserveState: false,
                 onSuccess: () => {

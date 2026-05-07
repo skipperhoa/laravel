@@ -22,6 +22,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         ]);
 
+        $middleware->preventRequestForgery(except: [
+           // 'stripe/*',
+           // 'http://example.com/foo/*',
+            'http://laravel13.test/languages',
+        ]);
+
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
