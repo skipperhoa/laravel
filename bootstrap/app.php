@@ -26,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
            // 'stripe/*',
            // 'http://example.com/foo/*',
             'http://laravel13.test/languages',
+            // 'http://laravel13.test/register',
+             // 'http://laravel13.test/login',
         ]);
 
 

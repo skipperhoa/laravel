@@ -5,9 +5,12 @@ import avatar from "@/assets/images/avatar.jpg";
 import { router } from '@inertiajs/react';
 import NavMenu from '../components/ui/app-nav';
 import  useCartStore  from '@/stores/cartStore';
-export default function Home({ message }) {
 
+export default function Home({ message }) {
+//   const ab = usePage().props;
+//   console.log(ab)
    const setting = useConfig();
+  
    const [lang,setLang] = useState(setting.get('config')['app.locale'] || 'en');
    console.log('setting', setting.get('translations'));
 
@@ -28,6 +31,8 @@ export default function Home({ message }) {
     return (
         <div className="">
             <NavMenu />
+
+
 
             <div className="max-w-4xl mx-auto my-10 bg-white shadow-lg rounded-lg overflow-hidden">
                 <div className="grid grid-cols-3 gap-6 p-6">
