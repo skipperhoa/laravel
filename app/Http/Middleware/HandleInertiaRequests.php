@@ -49,7 +49,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                'user' => $request->user(),
             ],
-
+            'flash' => [
+                'msg' => fn () => $request->session()->get('msg'),
+            ],
             'config' => fn () => config()->get(static::$sharedConfig),
 
             'translations' => [

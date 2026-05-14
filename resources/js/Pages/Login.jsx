@@ -1,4 +1,4 @@
-import React,{ useState} from 'react'
+import React,{ useState, useEffect} from 'react'
 import { Link, router, useForm, usePage, Form } from "@inertiajs/react";
 import AlertModal from "../components/ui/modal/alert-modal"
 // const csrf_token = document.cookie
@@ -6,6 +6,9 @@ import AlertModal from "../components/ui/modal/alert-modal"
 //     .find((r) => r.startsWith("XSRF-TOKEN="))
 //     ?.split("=")[1];
 export default function Login() {
+    const { auth,flash } = usePage().props;
+    console.log("Auth", auth)
+    console.log("flash", flash)
     const [open, setOpen] = useState(false)
     const [status,setStatus] = useState(false)
     const [message, setMessage] =  useState(null)
@@ -14,16 +17,21 @@ export default function Login() {
         password: "",
         remember: false,
     });
+  /*   useEffect(() => {
+        if (flash.msg) {
+            console.log(flash.msg)
+        }
+    }, [flash.msg]); */
     const eventAlert = (value)=>setOpen(value)
     const postLogin = (e) => {
         e.preventDefault();
-      
+
         post("/login", {
             onSuccess: () => {
                 setMessage("Đăng nhập thành công")
                 setStatus(false)
             },
-            
+
             onError: (errors) => {
                 let msg = Object.values(errors).join(' ');
                 console.log("lỗi",errors)

@@ -10,7 +10,7 @@ export default function Home({ message }) {
 //   const ab = usePage().props;
 //   console.log(ab)
    const setting = useConfig();
-  
+
    const [lang,setLang] = useState(setting.get('config')['app.locale'] || 'en');
    console.log('setting', setting.get('translations'));
 
@@ -30,7 +30,7 @@ export default function Home({ message }) {
 
     return (
         <div className="">
-            <NavMenu />
+
 
 
 

@@ -17,9 +17,9 @@ createInertiaApp({
     resolve: async (name) => {
         // Sử dụng resolvePageComponent để nạp file an toàn và đúng chuẩn Vite
         const page = await resolvePageComponent(
-            `./pages/${name}.jsx`,
+           `./pages/admin/${name}.jsx`,
 
-            import.meta.glob('./pages/**/*.jsx')
+            import.meta.glob('./pages/admin/**/*.jsx')
         );
 
         // Định nghĩa Persistent Layout ngay tại đây
@@ -27,13 +27,9 @@ createInertiaApp({
             if (name.startsWith('Public/')) {
                 return pageComponent;
             }
-            if (name === "Login" || name === "Register") {
-
-                return <GuestLayout>{pageComponent}</GuestLayout>;
-            }
 
             // mặt định
-            return <MainLayout>{pageComponent}</MainLayout>;
+            return <AuthenticatedLayout>{pageComponent}</AuthenticatedLayout>;
         });
 
         return page;

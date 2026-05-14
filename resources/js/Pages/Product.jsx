@@ -1,5 +1,4 @@
 import React from 'react'
-import NavMenu from '../components/ui/app-nav';
 import { useConfig } from '@/hooks/useConfig';
 import { FaCartArrowDown } from "react-icons/fa";
 import  useCartStore  from '@/stores/cartStore';
@@ -10,8 +9,6 @@ export default function Product({ products }) {
 
   return (
      <div className="">
-        <NavMenu />
-
                 <div className="max-w-4xl mx-auto my-10 bg-white shadow-lg rounded-lg overflow-hidden">
                     <div className="w-full">
                        <div className='flex flex-row items-center justify-center px-5'>

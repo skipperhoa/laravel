@@ -6,11 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-
-use App\Models\User;
-/* Route::get('/', function () {
-    return view('welcome');
-}); */
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -56,86 +51,5 @@ Route::post('languages', function (Request $request) {
     return back();
 });
 
-// authentication
-Route::get('/csrf-token', function () {
-    return response()->json(['csrfToken' => csrf_token()]);
-});
-Route::get("/login", function () {
-    return Inertia::render('Login');
-})->name("users.login");
-Route::get("/register", function () {
-    return Inertia::render('Register');
-});
-Route::post("register", function (Request $request) {
-    $data = $request->validate([
-        'name'     => 'required|string|max:255',
-        'email'    => 'required|email|unique:users',
-        'password' => ['required', 'confirmed', Password::min(8)],
-    ]);
-
-    $user = User::create([
-        'name'     => $data['name'],
-        'email'    => $data['email'],
-        'password' => Hash::make($data['password']),
-    ]);
-
-    Auth::login($user);
-
-    return redirect()->back()->with(['msg' => 'Đăng ký thành công']);
-});
-Route::post("/login", function (Request $request) {
-
-    $credentials = $request->validate([
-        'email'    => 'required|email',
-        'password' => 'required',
-    ]);
-
-    if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-
-        return redirect()->back()->withErrors(['msg' => 'Invalid email or password used.']);
-    }
-
-
-    $request->session()->regenerate();
-
-    return back();
-});
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post("/logout", function (Request $request) {
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return response()->json(['message' => 'Đăng xuất thành công']);
-    });
-    Route::get("/user", function (Request $request) {
-        return response()->json(['user' => $request->user()]);
-    });
-
-    Route::post("/change-password", function (Request $request) {
-        $request->validate([
-            'current_password' => 'required',
-            'password'         => ['required', 'confirmed', Password::min(8)],
-        ]);
-
-        if (!Hash::check($request->current_password, $request->user()->password)) {
-            return response()->json(['message' => 'Mật khẩu hiện tại không đúng'], 422);
-        }
-
-        $request->user()->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json(['message' => 'Đổi mật khẩu thành công']);
-    });
-});
-
-
-
-Route::get('/test', function () {
-    $lng = app()->getLocale();
-    return response()->json([
-        'message' => "Current locale: $lng",
-    ], Response::HTTP_OK);
-});
+include_once "auth.php";
+include_once "admin.php";
