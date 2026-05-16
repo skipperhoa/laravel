@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Inertia\Inertia;
 
 class HandleAdminView
 {
@@ -18,7 +19,7 @@ class HandleAdminView
 
 
         if ($request->is('admin/*') || $request->is('admin')) {
-            \Inertia\Inertia::setRootView('admin');
+            Inertia::setRootView('admin');
         }
 
         return $next($request);

@@ -1,7 +1,11 @@
 import React from 'react'
 import { Link,Head } from '@inertiajs/react'
-
+import { useConfig } from '@/hooks/useConfig';
 export default function AuthenticatedLayout({children, title}) {
+   const setting = useConfig();
+   useEffetc(() => {
+      console.log('auth', setting.get('auth'));
+   }, [setting.get('auth')])
   return (
     <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}

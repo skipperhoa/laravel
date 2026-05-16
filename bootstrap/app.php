@@ -3,8 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-
-
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -13,6 +13,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('api/*')) {
+                 return response()->json([
+                    'ok' => false,
+                    'message' => "In withMiddleware: Custom Unauthenticated message because no accept header!",
+                    'msg' => "In withMiddleware: Custom Unauthenticated message because no accept header!",
+                ], 401);
+            } else {
+                return route("users.login");
+            }
+        });
+
         $middleware->alias([
             'admin_view' => \App\Http\Middleware\HandleAdminView::class,
         ]);
@@ -36,5 +49,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Change response
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+        if ($request->is('api/*')) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 401);
+        }
+
+
+
+    });
     })->create();

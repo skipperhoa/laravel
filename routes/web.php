@@ -53,3 +53,4 @@ Route::post('languages', function (Request $request) {
 
 include_once "auth.php";
 include_once "admin.php";
+include_once "test.php";
