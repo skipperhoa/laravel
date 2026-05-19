@@ -17,15 +17,10 @@ export default function Login() {
         password: "",
         remember: false,
     });
-  /*   useEffect(() => {
-        if (flash.msg) {
-            console.log(flash.msg)
-        }
-    }, [flash.msg]); */
     const eventAlert = (value)=>setOpen(value)
     const postLogin = (e) => {
         e.preventDefault();
-
+         
         post("/login", {
             onSuccess: () => {
                 setMessage("Đăng nhập thành công")

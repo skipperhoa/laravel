@@ -6,10 +6,7 @@ import { router } from "@inertiajs/react";
 import { FaCartArrowDown } from "react-icons/fa";
 import useCartStore from "@/stores/cartStore";
 
-
 export default function NavMenu() {
-   
- 
     const { props } = usePage();
     const { cart } = useCartStore();
     const setting = useConfig();
@@ -36,10 +33,10 @@ export default function NavMenu() {
     };
 
     const userlogout = async (e) => {
-         e.preventDefault();
-         router.post("/logout");
+        e.preventDefault();
+        router.post("/logout");
     };
-   
+
     return (
         <div className="relative">
             <div className="w-full max-w-4xl mx-auto my-10 bg-white shadow-lg rounded-lg ">
@@ -104,24 +101,30 @@ export default function NavMenu() {
                                 </div>
                                 <div className="w-full h-full absolute top-[100%] left-0 invisible  group-hover:visible">
                                     <div className="w-full p-2 bg-gray-100 flex flex-col">
-                                        <Link
-                                            href="/login"
-                                            className="text-black text-sm py-1"
-                                        >
-                                            Login
-                                        </Link>
-                                        <Link
-                                            href="/register"
-                                            className="text-black text-sm py-1"
-                                        >
-                                            Register
-                                        </Link>
-                                        <Link href="/logout"
-                                            onClick={userlogout}
-                                            className="text-black text-sm py-1"
-                                        >
-                                            Logout
-                                        </Link>
+                                        {setting.get("auth.user")!==null ?(
+                                            <Link
+                                                href="/logout"
+                                                onClick={userlogout}
+                                                className="text-black text-sm py-1"
+                                            >
+                                                Logout
+                                            </Link>
+                                        ): (
+                                            <>
+                                                <Link
+                                                    href="/login"
+                                                    className="text-black text-sm py-1"
+                                                >
+                                                    Login
+                                                </Link>
+                                                <Link
+                                                    href="/register"
+                                                    className="text-black text-sm py-1"
+                                                >
+                                                    Register
+                                                </Link>
+                                            </>
+                                        ) }
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +132,6 @@ export default function NavMenu() {
                     </div>
                 </div>
             </div>
-            
         </div>
     );
 }

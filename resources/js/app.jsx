@@ -6,35 +6,51 @@ import GuestLayout from './layouts/GuestLayout';
 import AuthenticatedLayout from './layouts/AuthenticatedLayout';
 import MainLayout from './layouts/MainLayout';
 import {
-  QueryClient,
-  QueryClientProvider,
+    QueryClient,
+    QueryClientProvider,
 } from '@tanstack/react-query';
 
-// Create a client
+// Khởi tạo Query Client dùng chung cho toàn bộ ứng dụng
 const queryClient = new QueryClient();
 
 createInertiaApp({
     resolve: async (name) => {
-        // Sử dụng resolvePageComponent để nạp file an toàn và đúng chuẩn Vite
+        // Quét toàn bộ file trong thư mục Pages
         const page = await resolvePageComponent(
-            `./pages/${name}.jsx`,
-
-            import.meta.glob('./pages/**/*.jsx')
+            `./Pages/${name}.jsx`,
+            import.meta.glob('./Pages/**/*.jsx')
         );
 
-        // Định nghĩa Persistent Layout ngay tại đây
-        page.default.layout = page.default.layout || ((pageComponent) => {
+        // Kiểm tra xem Page cụ thể đó có tự định nghĩa layout riêng hay không
+        // Nếu không định nghĩa mới gán Persistent Layout mặc định theo phân vùng
+        if (page.default.layout === undefined) {
+            
+            // Trường hợp 1: Các trang thuộc phân vùng Public (Ví dụ: Pages/Public/Home.jsx)
             if (name.startsWith('Public/')) {
-                return pageComponent;
+                page.default.layout = (pageComponent) => pageComponent;
+            } 
+            
+            // Trường hợp 2: Các trang Auth cơ bản (Ví dụ: Pages/Login.jsx hoặc Pages/Register.jsx)
+            else if (name === "Login" || name === "Register" || name.startsWith('Auth/')) {
+                page.default.layout = (pageComponent) => (
+                    <GuestLayout>{pageComponent}</GuestLayout>
+                );
+            } 
+            
+            // Trường hợp 3: Các trang thuộc vùng Admin (Ví dụ: Pages/Admin/Dashboard.jsx)
+            else if (name.startsWith('Admin/')) {
+                page.default.layout = (pageComponent) => (
+                    <AuthenticatedLayout>{pageComponent}</AuthenticatedLayout>
+                );
+            } 
+            
+            // Trường hợp 4: Mặc định cho các trang Client thông thường khác
+            else {
+                page.default.layout = (pageComponent) => (
+                    <MainLayout>{pageComponent}</MainLayout>
+                );
             }
-            if (name === "Login" || name === "Register") {
-
-                return <GuestLayout>{pageComponent}</GuestLayout>;
-            }
-
-            // mặt định
-            return <MainLayout>{pageComponent}</MainLayout>;
-        });
+        }
 
         return page;
     },

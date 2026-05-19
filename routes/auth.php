@@ -1,4 +1,5 @@
 <?php
+
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,12 +12,17 @@ use App\Models\User;
 Route::get('/csrf-token', function () {
     return response()->json(['csrfToken' => csrf_token()]);
 });
-Route::get("/login", function () {
-    return Inertia::render('Login');
-})->name("users.login");
-Route::get("/register", function () {
-    return Inertia::render('Register');
+
+Route::middleware('guest')->group(function () {
+    Route::get("/login", function (Request $request) {
+        return Inertia::render('Login');
+    })->name("users.login");
+    Route::get("/register", function () {
+        return Inertia::render('Register');
+    });
 });
+
+
 Route::post("register", function (Request $request) {
     $data = $request->validate([
         'name'     => 'required|string|max:255',
@@ -49,7 +55,10 @@ Route::post("/login", function (Request $request) {
 
     $request->session()->regenerate();
 
-    return redirect()->back()->with(["msg"=>"Đăng nhập thành công"]);
+    // return 1;
+    return redirect()->back()->with(["msg" => "Đăng nhập thành công"]);
+
+    //return response()->json(['message' => 'Đăng nhập thành công', 'user' =>$request->user()->only('id', 'name', 'email')]);
 });
 
 Route::middleware('auth')->group(function () {
@@ -81,4 +90,3 @@ Route::middleware('auth')->group(function () {
         return response()->json(['message' => 'Đổi mật khẩu thành công']);
     });
 });
- 

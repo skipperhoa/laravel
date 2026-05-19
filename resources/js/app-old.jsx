@@ -18,23 +18,23 @@ createInertiaApp({
         // Sử dụng resolvePageComponent để nạp file an toàn và đúng chuẩn Vite
         const page = await resolvePageComponent(
             `./Pages/${name}.jsx`,
+
             import.meta.glob('./Pages/**/*.jsx')
         );
 
-        // ĐÚNG CHUẨN: Kiểm tra xem trang có tự định nghĩa layout riêng không
-        // Nếu không có, ta mới gán Layout mặc định theo phân vùng tên trang
+        // Định nghĩa Persistent Layout ngay tại đây
         page.default.layout = page.default.layout || ((pageComponent) => {
-            
-            // 1. Nếu là các trang Public (Không cần bọc Layout đăng nhập)
             if (name.startsWith('Public/')) {
-                page.default.layout = (pageComponent) => pageComponent;
-            } 
-            else if (name === "Login" || name === "Register") {
-                            return <GuestLayout>{pageComponent}</GuestLayout>;
+                return pageComponent;
             }
-            return <AuthenticatedLayout>{pageComponent}</AuthenticatedLayout>;
-         });
-        
+            if (name === "Login" || name === "Register") {
+
+                return <GuestLayout>{pageComponent}</GuestLayout>;
+            }
+
+            // mặt định
+            return <MainLayout>{pageComponent}</MainLayout>;
+        });
 
         return page;
     },
