@@ -1,8 +1,8 @@
 import React from "react";
 
-export default function User({ users }) {
-    console.log(users)
-    
+export default function Role({ roles }) {
+    console.log(roles)
+
     return (
         <div className="p-6">
             <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
@@ -15,14 +15,12 @@ export default function User({ users }) {
                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                                 Name
                             </th>
+
                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                                Email
+                                Users
                             </th>
                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                                Roles
-                            </th>
-                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                                Permission
+                                Permissions
                             </th>
                             <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
                                 Edit
@@ -34,43 +32,36 @@ export default function User({ users }) {
                     </thead>
 
                     <tbody>
-                        {users.map((user) => (
+                        {roles.map((role) => (
                             <tr
-                                key={user.id}
+                                key={role.id}
                                 className="border-t hover:bg-gray-50 transition"
                             >
                                 <td className="px-6 py-4 text-sm text-gray-700">
-                                    {user.id}
+                                    {role.id}
                                 </td>
-
-                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                    {user.name}
-                                </td>
-
                                 <td className="px-6 py-4 text-sm text-gray-700">
-                                    {user.email}
+                                    {role.name}
                                 </td>
-
-                                <td className="px-6 py-4">
+                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
                                     {
-                                        user.roles.map(role => (
-                                            <span key={role} className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mr-1">
-                                                {role}
+                                        role.users.map(user => (
+                                            <span key={user} className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mr-1">
+                                                {user}
                                             </span>
                                         ))
                                     }
-                                   
                                 </td>
 
                                 <td className="px-6 py-4">
                                     {
-                                        user.permissions.map(permission => (
-                                            <span key={permission} className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-1">
+                                        role.permissions.map(permission => (
+                                            <span key={permission} className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mr-1">
                                                 {permission}
                                             </span>
                                         ))
                                     }
-                                   
+
                                 </td>
 
                                 <td className="px-6 py-4 text-center">

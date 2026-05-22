@@ -30,8 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Tùy biến logic redirect cho nhóm route dùng middleware 'guest'
         $middleware->redirectUsersTo(function (Request $request) {
             $user = $request->user();
-            
-            // Check nếu user có role super-admin 
+
+            // Check nếu user có role super-admin
             if ($user && method_exists($user, 'hasRole') && $user->hasRole('super-admin')) {
                 return 'admin/dashboard';
             }
@@ -40,13 +40,13 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($user && $user->can('view dashboard')) {
                 return 'admin/dashboard';
             }
-            
+
             return '/'; // Trang chủ mặc định cho các user khác
         });
 
         $middleware->alias([
             'admin_view' => \App\Http\Middleware\HandleAdminView::class,
-            //'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,// mặt định của spatie 
+            //'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,// mặt định của spatie
             'role' => \App\Http\Middleware\RoleMiddleware::class, // ghi đè để sử dụng Gate trong AppServiceProvider
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
@@ -66,7 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'http://example.com/foo/*',
            // 'http://laravel13.test/languages',
             // 'http://laravel13.test/register',
-              'http://laravel13.test/login',
+            //  'http://laravel13.test/login',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

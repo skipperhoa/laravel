@@ -22,7 +22,13 @@ export default function AuthenticatedLayout({children, title}) {
                         📊 Dashboard
                     </Link>
                     <Link href="/admin/users" className="block p-3 hover:bg-slate-700 rounded transition">
-                        👥 Quản lý User
+                        👥 Quản lý Users
+                    </Link>
+                   <Link href="/admin/roles" className="block p-3 hover:bg-slate-700 rounded transition">
+                        👥 Quản lý Roles
+                    </Link>
+                    <Link href="/admin/permissions" className="block p-3 hover:bg-slate-700 rounded transition">
+                        👥 Quản lý Permissions
                     </Link>
                     <Link href="/admin/settings" className="block p-3 hover:bg-slate-700 rounded transition">
                         ⚙️ Cài đặt
