@@ -10,10 +10,7 @@ export default function Edit({ user, roles, permissions }) {
         roles: user.roles? user.roles.map(r => r) : [],
         permissions: user.permissions? user.permissions.map(p => p) : [],
     });
-   /* console.log("user edit",user.permissions)
-   const a = user.permissions.map(p => p)
-   console.log("user edit4",a)
- */
+
 const t = user.roles? user.roles.map(r => r) : []
 console.log(t)
     const submit = (e) => {

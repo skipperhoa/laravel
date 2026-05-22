@@ -1,4 +1,4 @@
-import AdminLayout from '@/layouts/AdminLayout';
+
 import Form from './Form';
 import { useForm } from '@inertiajs/react';
 
@@ -7,16 +7,17 @@ export default function Create({ roles, permissions }) {
         name: '',
         email: '',
         password: '',
+        roles: [],
+        permissions: [],
     });
 
     const submit = (e) => {
         e.preventDefault();
-
         post('/admin/users');
     };
 
     return (
-        <AdminLayout>
+
             <div className="p-6">
                 <h1 className="text-2xl font-bold mb-6">
                     Create User
@@ -32,6 +33,6 @@ export default function Create({ roles, permissions }) {
                     permissions={permissions}
                 />
             </div>
-        </AdminLayout>
+
     );
 }

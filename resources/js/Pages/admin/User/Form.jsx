@@ -10,8 +10,22 @@ export default function Form({
     permissions = [],
 }) {
 
-    console.log("Data",data)
-    console.log("User",user)
+
+    const dataRolePermission = [
+        {
+            "role":"admin",
+            "permissions":['manage users', 'manage roles', 'manage permissions']
+        },
+        {
+            "role":"writer",
+            "permissions":['manage posts', 'manage comments']
+        },
+        {
+            "role":"Dev",
+            "permissions":['delete user', 'edit user']
+        }
+    ]
+
     return (
         <form
             onSubmit={submit}
@@ -70,67 +84,88 @@ export default function Form({
                 )}
             </div>
 
+            <label htmlFor="" className="py-1 text-xl block">
+                Roles
+            </label>
+            <div className="bg-[#07132A] rounded-2xl p-2 max-w-xl">
+                <div className=" flex flex-row flex-wrap gap-5">
+                    {roles.map((role) => (
+                        <label
+                            key={role.id}
+                            className="flex items-center justify-between py-2 cursor-pointer gap-2"
+                        >
+                            <span className="text-white font-semibold text-sm">
+                                {role.name}
+                            </span>
 
-            <label htmlFor="" className="py-1 text-xl block">Roles</label>
-            <div className="bg-[#07132A] rounded-2xl p-6 max-w-xl">
-                <div className="divide-y divide-slate-700">
-                    {
-                        roles.map(role => (
-                            <label key={role.id} className="flex items-center justify-between py-5 cursor-pointer">
-                                <span className="text-white font-semibold text-lg">
-                                    {role.name}
-                                </span>
-
-                                <input
-                                    type="checkbox"
-                                    defaultChecked={data.roles && data.roles.includes(role.name)}
-                                    onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setData('roles', [...(data.roles || []), role.name]);
-                                        } else {
-                                            setData('roles', data.roles.filter(r => r !== role.name));
-                                        }
-                                    }}
-                                    className="w-5 h-5 accent-indigo-500"
-                                />
-                            </label>
-                        ))
-                    }
-
-
+                            <input
+                                type="checkbox"
+                                defaultChecked={
+                                    data.roles && data.roles.includes(role.name)
+                                }
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setData("roles", [
+                                            ...(data.roles || []),
+                                            role.name,
+                                        ]);
+                                    } else {
+                                        setData(
+                                            "roles",
+                                            data.roles.filter(
+                                                (r) => r !== role.name,
+                                            ),
+                                        );
+                                    }
+                                }}
+                                className="w-4 h-4 accent-indigo-500"
+                            />
+                        </label>
+                    ))}
                 </div>
             </div>
 
-            <label htmlFor="" className="py-1 text-xl block">Permissions</label>
-            <div className="bg-[#07132A] rounded-2xl p-6 max-w-xl">
-                <div className="divide-y divide-slate-700">
-                    {
-                        permissions.map(permission => (
-                            <label key={permission.id} className="flex items-center justify-between py-5 cursor-pointer">
-                                <span className="text-white font-semibold text-lg">
-                                    {permission.name}
-                                </span>
+            <label htmlFor="" className="py-1 text-xl block">
+                Permissions
+            </label>
+            <div className="bg-[#07132A] rounded-2xl p-2 max-w-xl">
+                <div className=" flex flex-row flex-wrap gap-5">
+                    {permissions.map((permission) => (
+                        <label
+                            key={permission.id}
+                            className="flex items-center justify-between py-2 cursor-pointer gap-2"
+                        >
+                            <span className="text-white font-semibold text-sm">
+                                {permission.name}
+                            </span>
 
-                                <input
-                                    type="checkbox"
-                                    defaultChecked={data.permissions && data.permissions.includes(permission.name)}
-                                    onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setData('permissions', [...(data.permissions || []), permission.name]);
-                                        } else {
-                                            setData('permissions', data.permissions.filter(p => p !== permission.name));
-                                        }
-                                    }}
-                                    className="w-5 h-5 accent-indigo-500"
-                                />
-                            </label>
-                        ))
-                    }
-
-
+                            <input
+                                type="checkbox"
+                                defaultChecked={
+                                    data.permissions &&
+                                    data.permissions.includes(permission.name)
+                                }
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setData("permissions", [
+                                            ...(data.permissions || []),
+                                            permission.name,
+                                        ]);
+                                    } else {
+                                        setData(
+                                            "permissions",
+                                            data.permissions.filter(
+                                                (p) => p !== permission.name,
+                                            ),
+                                        );
+                                    }
+                                }}
+                                className="w-4 h-4 accent-indigo-500"
+                            />
+                        </label>
+                    ))}
                 </div>
             </div>
-
 
             <div>
                 <label className="block mb-2 font-medium">Roles</label>

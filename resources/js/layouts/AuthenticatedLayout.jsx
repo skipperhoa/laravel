@@ -18,7 +18,7 @@ export default function AuthenticatedLayout({children, title}) {
                     Admin Panel
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
-                    <Link href="/admin" className="block p-3 hover:bg-slate-700 rounded transition">
+                    <Link href="/admin/dashboard" className="block p-3 hover:bg-slate-700 rounded transition">
                         📊 Dashboard
                     </Link>
                     <Link href="/admin/users" className="block p-3 hover:bg-slate-700 rounded transition">

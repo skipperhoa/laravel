@@ -1,11 +1,24 @@
 import React from "react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage , router} from "@inertiajs/react";
 export default function User({ users }) {
+    const { flash } = usePage().props;
     console.log(users)
-
+    const deleteUser = (id) => {
+            if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+                router.delete(`/admin/users/${id}/delete`);
+            }
+    };
     return (
         <div className="p-6">
+              {flash.success && (
+                     <div className="mb-4 p-2 rounded-lg bg-green-100">
+                        <div className="text-sm">{flash.success}</div>
+                    </div>
+                )}
             <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
+                 <Link href={`/admin/users/create`} className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white text-sm font-medium transition m-4 inline-block">
+                                    Create User
+                </Link>
                 <table className="min-w-full bg-white">
                     <thead className="bg-gray-100">
                         <tr>
@@ -54,7 +67,7 @@ export default function User({ users }) {
                                 <td className="px-6 py-4">
                                     {
                                         user.roles.map(role => (
-                                            <span key={role} className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mr-1">
+                                            <span key={role} className="px-3 py-1 m-1 inline-block rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mr-1">
                                                 {role}
                                             </span>
                                         ))
@@ -65,7 +78,7 @@ export default function User({ users }) {
                                 <td className="px-6 py-4">
                                     {
                                         user.permissions.map(permission => (
-                                            <span key={permission} className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-1">
+                                            <span key={permission} className="px-3 py-1 m-1 inline-block rounded-full text-xs font-semibold bg-green-100 text-green-700 mr-1">
                                                 {permission}
                                             </span>
                                         ))
@@ -80,9 +93,12 @@ export default function User({ users }) {
                                 </td>
 
                                 <td className="px-6 py-4 text-center">
-                                    <Link href={`/admin/users/${user.id}/delete`} className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition">
+                                    <button
+                                        onClick={() => deleteUser(user.id)}
+                                        className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition"
+                                    >
                                         Delete
-                                    </Link>
+                                    </button>
                                 </td>
                             </tr>
                         ))}
