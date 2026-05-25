@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 export default function Form({
     data,
     setData,
@@ -8,23 +9,60 @@ export default function Form({
     user = null,
     roles = [],
     permissions = [],
+    dataRolePermission = [],
 }) {
+    const [permissionsToRoles, setPermissionsToRoles] = useState([]);
 
-
-    const dataRolePermission = [
-        {
-            "role":"admin",
-            "permissions":['manage users', 'manage roles', 'manage permissions']
-        },
-        {
-            "role":"writer",
-            "permissions":['manage posts', 'manage comments']
-        },
-        {
-            "role":"Dev",
-            "permissions":['delete user', 'edit user']
+    useEffect(() => {
+        if (isEdit && user) {
+            let tempPermissions = [];
+            user.roles.forEach((role) => {
+                const rolePerm = dataRolePermission.find((r) => r.role === role);
+                if (rolePerm) {
+                    tempPermissions.push(...rolePerm.permissions);
+                }
+            });
+            setPermissionsToRoles([...new Set(tempPermissions)]);
+            // xóa các permission đã có trong roles khỏi permissions riêng của user
+            const individualPerms = user.permissions.filter(
+                (p) => !tempPermissions.includes(p),
+            );
+            setData("permissions", individualPerms);
         }
-    ]
+    }, [isEdit, user, dataRolePermission]);
+
+
+    const getPermissionsForRole = (roleName, checked) => {
+        if (checked) {
+
+            const role = dataRolePermission.find((r) => r.role === roleName);
+
+            let tempPermissions = [...permissionsToRoles];
+
+            if (role) {
+
+                tempPermissions.push(...role.permissions);
+
+                setPermissionsToRoles([...new Set(tempPermissions)]);
+            }
+        } else {
+
+            const remainingRoles = data.roles.filter((r) => r !== roleName);
+
+            let tempPermissions = [];
+
+            remainingRoles.forEach((role) => {
+                const perm = dataRolePermission.find((r) => r.role === role);
+
+                if (perm) {
+                    tempPermissions.push(...perm.permissions);
+                }
+            });
+
+            setPermissionsToRoles([...new Set(tempPermissions)]);
+
+        }
+    };
 
     return (
         <form
@@ -117,11 +155,30 @@ export default function Form({
                                             ),
                                         );
                                     }
+                                    getPermissionsForRole(
+                                        role.name,
+                                        e.target.checked,
+                                    );
                                 }}
                                 className="w-4 h-4 accent-indigo-500"
                             />
                         </label>
                     ))}
+                </div>
+                <div className="mt-2">
+                    {permissionsToRoles.length > 0 && (
+                        <div className="text-sm text-black m-1 text-white">
+                            Permissions for selected roles:
+                            {permissionsToRoles.map((perm, index) => (
+                                <span
+                                    key={index}
+                                    className="font-medium m-1 inline-block text-indigo-600 bg-white p-1 text-sm rounded"
+                                >
+                                    {perm}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -130,72 +187,52 @@ export default function Form({
             </label>
             <div className="bg-[#07132A] rounded-2xl p-2 max-w-xl">
                 <div className=" flex flex-row flex-wrap gap-5">
-                    {permissions.map((permission) => (
-                        <label
-                            key={permission.id}
-                            className="flex items-center justify-between py-2 cursor-pointer gap-2"
-                        >
-                            <span className="text-white font-semibold text-sm">
-                                {permission.name}
-                            </span>
+                    {permissions.map((permission) => {
+                        if (permissionsToRoles.includes(permission.name)) {
+                            return null; // Skip permissions that are already included via roles
+                        }
+                        return (
+                            <label
+                                key={permission.id}
+                                className="flex items-center justify-between py-2 cursor-pointer gap-2"
+                            >
+                                <span className="text-white font-semibold text-sm">
+                                    {permission.name}
+                                </span>
 
-                            <input
-                                type="checkbox"
-                                defaultChecked={
-                                    data.permissions &&
-                                    data.permissions.includes(permission.name)
-                                }
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setData("permissions", [
-                                            ...(data.permissions || []),
-                                            permission.name,
-                                        ]);
-                                    } else {
-                                        setData(
-                                            "permissions",
-                                            data.permissions.filter(
-                                                (p) => p !== permission.name,
-                                            ),
-                                        );
+                                <input
+                                    type="checkbox"
+                                    defaultChecked={
+                                        data.permissions &&
+                                        data.permissions.includes(permission.name)
                                     }
-                                }}
-                                className="w-4 h-4 accent-indigo-500"
-                            />
-                        </label>
-                    ))}
-                </div>
-            </div>
-
-            <div>
-                <label className="block mb-2 font-medium">Roles</label>
-
-                {/*  <select
-                    multiple
-                    value={data.roles || []}
-                    onChange={(e) =>
-                        setData(
-                            'roles',
-                            Array.from(
-                                e.target.selectedOptions,
-                                (option) => option.value
-                            )
+                                /*  disabled={
+                                        !permissionsToRoles.includes(
+                                            permission.name,
+                                        )
+                                    } */
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setData("permissions", [
+                                                ...(data.permissions || []),
+                                                permission.name,
+                                            ]);
+                                        } else {
+                                            setData(
+                                                "permissions",
+                                                data.permissions.filter(
+                                                    (p) => p !== permission.name,
+                                                ),
+                                            );
+                                        }
+                                    }}
+                                    className="w-4 h-4 accent-indigo-500"
+                                />
+                            </label>
                         )
-                    }
-                    className="w-full border rounded-lg px-4 py-2"
-                >
-                    {roles.map((role) => (
-                        <option key={role.id} value={role.name} selected={data.roles && data.roles.includes(role.name)}>
-                            {role.name}
-                        </option>
-                    ))}
-                </select>
+                    })}
 
-                {errors.roles && (
-                    <p className="text-red-500 text-sm mt-1">
-                        {errors.roles}
-                    </p>
-                )} */}
+                </div>
             </div>
 
             <button

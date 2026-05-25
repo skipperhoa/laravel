@@ -20,7 +20,8 @@ export default function Login() {
     const eventAlert = (value)=>setOpen(value)
     const postLogin = (e) => {
         e.preventDefault();
-         
+        console.log("Data gửi đi", data)
+       // return;
         post("/login", {
             onSuccess: () => {
                 setMessage("Đăng nhập thành công")
@@ -92,7 +93,7 @@ export default function Login() {
                         <label className="flex items-center gap-2 text-gray-600">
                             <input
                                 type="checkbox"
-                                className="rounded"
+                                className="rounded" onChange={(e) => setData("remember", e.target.checked)}
                                 name="remember"
                             ></input>
                             Remember me

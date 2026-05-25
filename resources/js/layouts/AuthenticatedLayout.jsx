@@ -21,6 +21,9 @@ export default function AuthenticatedLayout({children, title}) {
                     <Link href="/admin/dashboard" className="block p-3 hover:bg-slate-700 rounded transition">
                         📊 Dashboard
                     </Link>
+                    <Link href="/admin/profile" className="block p-3 hover:bg-slate-700 rounded transition">
+                        � Profile
+                    </Link>
                     <Link href="/admin/users" className="block p-3 hover:bg-slate-700 rounded transition">
                         👥 Quản lý Users
                     </Link>
@@ -48,7 +51,13 @@ export default function AuthenticatedLayout({children, title}) {
                     <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
                     <div className="flex items-center space-x-4">
                         <span className="text-sm text-gray-600">Xin chào, {setting.get('auth.user').name}</span>
-                        <div className="w-8 h-8 bg-slate-500 rounded-full"></div>
+                        <div className="w-8 h-8 bg-slate-500 rounded-full">
+                            <img
+                                src={setting.get('auth.user').avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(setting.get('auth.user').name) + "&background=random&size=128"}
+                                alt="avatar"
+                                className="h-full w-full rounded-full object-cover"
+                            />
+                        </div>
                     </div>
                 </header>
 

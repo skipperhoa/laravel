@@ -2,19 +2,20 @@
 import Form from './Form';
 import { useForm } from '@inertiajs/react';
 
-export default function Edit({ user, roles, permissions }) {
+export default function Edit({ user, roles, permissions, dataRolePermission }) {
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         email: user.email || '',
         password: '',
         roles: user.roles? user.roles.map(r => r) : [],
         permissions: user.permissions? user.permissions.map(p => p) : [],
+        dataRolePermission: dataRolePermission || [],
+
     });
 
-const t = user.roles? user.roles.map(r => r) : []
-console.log(t)
     const submit = (e) => {
         e.preventDefault();
+        console.log(data)
 
         put(`/admin/users/${user.id}`);
     };
@@ -36,6 +37,7 @@ console.log(t)
                     user={user}
                     roles={roles}
                     permissions={permissions}
+                    dataRolePermission={dataRolePermission}
                 />
             </div>
 

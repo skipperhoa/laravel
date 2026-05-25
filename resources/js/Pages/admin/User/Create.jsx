@@ -2,17 +2,19 @@
 import Form from './Form';
 import { useForm } from '@inertiajs/react';
 
-export default function Create({ roles, permissions }) {
+export default function Create({ roles, permissions, dataRolePermission }) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
         password: '',
         roles: [],
         permissions: [],
+        dataRolePermission: dataRolePermission || [],
     });
 
     const submit = (e) => {
         e.preventDefault();
+        //console.log(data)
         post('/admin/users');
     };
 
@@ -31,6 +33,7 @@ export default function Create({ roles, permissions }) {
                     submit={submit}
                     roles={roles}
                     permissions={permissions}
+                    dataRolePermission={dataRolePermission}
                 />
             </div>
 

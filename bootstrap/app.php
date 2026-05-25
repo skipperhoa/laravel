@@ -66,7 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'http://example.com/foo/*',
            // 'http://laravel13.test/languages',
             // 'http://laravel13.test/register',
-            //  'http://laravel13.test/login',
+              'http://laravel13.test/login',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

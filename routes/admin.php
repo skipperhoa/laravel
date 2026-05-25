@@ -68,6 +68,21 @@ Route::middleware(['auth', 'admin_view'])
 
             Route::get('/users/{id}/edit', function ($id) {
                 $user = \App\Models\User::findOrFail($id);
+                $dataRolePermission = [];
+                $roles = \Spatie\Permission\Models\Role::with('permissions')->get();
+                foreach ($roles as $role) {
+                    $arrayRole = array();
+                    $arrayRole['role'] = $role->name;
+                    if ($role->permissions->isNotEmpty()) {
+                        foreach ($role->permissions as $permission) {
+                            $arrayRole['permissions'][] = $permission->name;
+                        }
+                    }else{
+                        $arrayRole['permissions'] = [];
+                    }
+                    $dataRolePermission[] = $arrayRole;
+                }
+
                 return Inertia::render('Admin/User/Edit', [
                     'user' => [
                         'id' => $user->id,
@@ -78,6 +93,7 @@ Route::middleware(['auth', 'admin_view'])
                     ],
                     'roles' => \Spatie\Permission\Models\Role::all(),
                     'permissions' => \Spatie\Permission\Models\Permission::all(),
+                    'dataRolePermission' => $dataRolePermission,
                 ]);
             })->middleware('permission:edit users')->name('admin.users.edit');
 
@@ -151,9 +167,25 @@ Route::middleware(['auth', 'admin_view'])
             })->middleware('permission:delete users')->name('admin.users.delete');
 
              Route::get('/users/create', function () {
+                $dataRolePermission = [];
+                $roles = \Spatie\Permission\Models\Role::with('permissions')->get();
+                foreach ($roles as $role) {
+                    $arrayRole = array();
+                    $arrayRole['role'] = $role->name;
+                    if ($role->permissions->isNotEmpty()) {
+                        foreach ($role->permissions as $permission) {
+                            $arrayRole['permissions'][] = $permission->name;
+                        }
+                    }else{
+                        $arrayRole['permissions'] = [];
+                    }
+                    $dataRolePermission[] = $arrayRole;
+                }
+               // dd($dataRolePermission);
                 return Inertia::render('Admin/User/Create', [
                     'roles' => \Spatie\Permission\Models\Role::all(),
                     'permissions' => \Spatie\Permission\Models\Permission::all(),
+                    'dataRolePermission' => $dataRolePermission,
                 ]);
             })->middleware('permission:create users')->name('admin.users.create');
             // end User Management
@@ -180,6 +212,7 @@ Route::middleware(['auth', 'admin_view'])
             })->middleware('permission:manage roles')->name('admin.roles');
 
             Route::get('/roles/create', function () {
+
                 return Inertia::render('Admin/Role/Create', [
                     'permissions' => \Spatie\Permission\Models\Permission::all()
                 ]);
@@ -204,7 +237,7 @@ Route::middleware(['auth', 'admin_view'])
             Route::delete('/roles/{id}/delete', function ($id) {
                 $role = \Spatie\Permission\Models\Role::findOrFail($id);
                 $role->syncPermissions([]); // thu hồi tất cả permission trước khi xóa role
-                $role->syncUsers([]); // thu hồi tất cả user trước khi xóa role
+                $role->syncModels([]); // thu hồi tất cả user trước khi xóa role
                 $role->delete();
                 return redirect()->route('admin.roles')->with('success', 'Role deleted successfully.');
             })->middleware('permission:delete roles')->name('admin.roles.delete');
@@ -305,11 +338,16 @@ Route::middleware(['auth', 'admin_view'])
             })->middleware('permission:create permissions')->name('admin.permissions.store');
 
             Route::delete('/permissions/{id}/delete', function ($id) {
+
                 $permission = \Spatie\Permission\Models\Permission::findOrFail($id);
-                $permission->syncRoles([]); // thu hồi tất cả role trước khi xóa permission
-                $permission->syncUsers([]); // thu hồi tất cả user trước khi xóa permission
+                // thu hồi tất cả role trước khi xóa permission
+                $permission->syncRoles([]);
+                //thu hồi tất cả user trước khi xóa permission
+                $permission->users()->detach(); //$permission->users()->sync([]);
+
                 $permission->delete();
                 return redirect()->route('admin.permissions')->with('success', 'Permission deleted successfully.');
+
             })->middleware('permission:delete permissions')->name('admin.permissions.delete');
 
              Route::get('/permissions/{id}/edit', function ($id) {
@@ -343,6 +381,22 @@ Route::middleware(['auth', 'admin_view'])
              })->middleware('permission:edit permissions')->name('admin.permissions.update');
 
              //end permission
+
+            //  Profile
+            Route::get('/profile', function () {
+                $user = Auth::user();
+                return Inertia::render('Admin/Profile/Index', [
+                    'user' => [
+                        'name' => $user->name,
+                        'avatar' => $user->avatar,
+                        'email' => $user->email,
+                        'roles' => $user->roles->pluck('name'),
+                        'permissions' => $user->getAllPermissions()->pluck('name'),
+                    ],
+
+                ]);
+
+             })->name('admin.profile');
 
      //   });
 
