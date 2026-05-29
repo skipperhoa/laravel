@@ -50,11 +50,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class, // ghi đè để sử dụng Gate trong AppServiceProvider
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+             'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
 
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
+          //  \Illuminate\Session\Middleware\AuthenticateSession::class
         ]);
         $middleware->api(append: [
             \App\Http\Middleware\SetLocale::class,
@@ -66,7 +68,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'http://example.com/foo/*',
            // 'http://laravel13.test/languages',
             // 'http://laravel13.test/register',
-              'http://laravel13.test/login',
+             // 'http://laravel13.test/login',
+              'http://laravel-react.test/admin/users/change-password',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -14,7 +14,7 @@ export default function Create({ roles, permissions, dataRolePermission }) {
 
     const submit = (e) => {
         e.preventDefault();
-        //console.log(data)
+       // console.log(data)
         post('/admin/users');
     };
 

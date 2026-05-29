@@ -64,8 +64,10 @@ Route::post("/login", function (Request $request) {
 Route::middleware('auth')->group(function () {
     Route::post("/logout", function (Request $request) {
         Auth::guard('web')->logout();
-        // $request->session()->invalidate();
-        // $request->ses                                                    sion()->regenerateToken();
+
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->back()->with(['msg' => 'Đăng xuất thành công']);
     });

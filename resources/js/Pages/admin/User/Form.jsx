@@ -12,6 +12,8 @@ export default function Form({
     dataRolePermission = [],
 }) {
     const [permissionsToRoles, setPermissionsToRoles] = useState([]);
+    const [permissionsToUser,setPermissionsToUser] = useState([]);
+    const [check,setCheck] = useState(false);
 
     useEffect(() => {
         if (isEdit && user) {
@@ -23,14 +25,15 @@ export default function Form({
                 }
             });
             setPermissionsToRoles([...new Set(tempPermissions)]);
-            // xóa các permission đã có trong roles khỏi permissions riêng của user
+            // xóa các permission đã có trong roles, khỏi permissions riêng của user
             const individualPerms = user.permissions.filter(
                 (p) => !tempPermissions.includes(p),
             );
             setData("permissions", individualPerms);
+            console.log("co")
+            setPermissionsToUser(individualPerms)
         }
     }, [isEdit, user, dataRolePermission]);
-
 
     const getPermissionsForRole = (roleName, checked) => {
         if (checked) {
@@ -44,8 +47,20 @@ export default function Form({
                 tempPermissions.push(...role.permissions);
 
                 setPermissionsToRoles([...new Set(tempPermissions)]);
+
+              //  setCheck(true)
+
+                const individualPerms = data.permissions.filter(
+                    (p) => !tempPermissions.includes(p),
+                );
+
+                setData('permissions',individualPerms);
+
+
             }
         } else {
+
+            setData('permissions',permissionsToUser);
 
             const remainingRoles = data.roles.filter((r) => r !== roleName);
 
@@ -56,12 +71,14 @@ export default function Form({
 
                 if (perm) {
                     tempPermissions.push(...perm.permissions);
+
                 }
             });
 
             setPermissionsToRoles([...new Set(tempPermissions)]);
-
         }
+
+
     };
 
     return (

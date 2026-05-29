@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Database\Eloquent\Collection;
 use Inertia\Inertia;
-
-Route::middleware(['auth', 'admin_view'])
+use Illuminate\Support\Facades\DB;
+Route::middleware(['auth', 'admin_view','auth.session'])
     ->prefix('admin')
     ->group(function () {
 
@@ -156,14 +156,20 @@ Route::middleware(['auth', 'admin_view'])
 
                 return redirect()->route('admin.users')->with('success', 'User updated successfully.');
 
-            })->middleware('permission:edit users')->name('admin.users.update');
+            })->where('id', '[0-9]+')->middleware('permission:edit users')->name('admin.users.update');
 
              Route::delete('/users/{id}/delete', function ($id) {
                 $user = \App\Models\User::findOrFail($id);
+                if (!$user) {
+                    return redirect()
+                        ->route('admin.users')
+                        ->with('error', 'User does not exist.');
+                }
+                if((Auth::id() === $user->id)) return redirect()->route('admin.users')->with('error', 'không thể xoá user này.');
                 $user->syncRoles([]); // thu hồi tất cả role trước khi xóa user
                 $user->syncPermissions([]); // thu hồi tất cả permission trước khi xóa user
                 $user->delete();
-                return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
+                return redirect()->route('admin.users')->with('success', 'Xoá user thành công');
             })->middleware('permission:delete users')->name('admin.users.delete');
 
              Route::get('/users/create', function () {
@@ -188,6 +194,8 @@ Route::middleware(['auth', 'admin_view'])
                     'dataRolePermission' => $dataRolePermission,
                 ]);
             })->middleware('permission:create users')->name('admin.users.create');
+
+
             // end User Management
 
 
@@ -362,7 +370,7 @@ Route::middleware(['auth', 'admin_view'])
                 ]);
             })->middleware('permission:edit permissions')->name('admin.permissions.edit');
 
-             Route::put('/permissions/{id}', function (Request $request, $id) {
+            Route::put('/permissions/{id}', function (Request $request, $id) {
                 $permission = \Spatie\Permission\Models\Permission::findOrFail($id);
 
                 $validatedData = $request->validate([
@@ -383,8 +391,29 @@ Route::middleware(['auth', 'admin_view'])
              //end permission
 
             //  Profile
-            Route::get('/profile', function () {
+            Route::get('/profile', function (Request $request) {
                 $user = Auth::user();
+                $sessionLogin = session()->getId();
+                $data = $request->session()->all();
+               /*  dd([
+                    'auth_check' => Auth::check(),
+                    'via_remember' => Auth::viaRemember(),
+                    'session_id' => session()->getId(),
+                    'user_id' => Auth::id(),
+                    'cookies' => $request->cookies->all(),
+                ]);
+                dd($data); */
+                $sessions = DB::table('sessions')
+                        ->where('user_id', $request->user()->id)
+                        ->orderByDesc('last_activity')
+                        ->get();
+                $sessions = $sessions->map(function ($session) {
+                    $session->time = date('Y-m-d H:i',$session->last_activity);
+                    $session->is_current_device =
+                        $session->id === session()->getId();
+
+                    return $session;
+                });
                 return Inertia::render('Admin/Profile/Index', [
                     'user' => [
                         'name' => $user->name,
@@ -392,11 +421,79 @@ Route::middleware(['auth', 'admin_view'])
                         'email' => $user->email,
                         'roles' => $user->roles->pluck('name'),
                         'permissions' => $user->getAllPermissions()->pluck('name'),
+                        'sessions' => $sessions
                     ],
 
                 ]);
 
              })->name('admin.profile');
+
+
+            Route::put('users/change-password', function (Request $request) {
+
+                $request->validate([
+                    'current_password' => [
+                        'required',
+                        'current_password',
+                    ],
+
+                    'new_password' => [
+                        'required',
+                        'confirmed',
+
+                        Password::min(8)
+                            ->letters()
+                            ->mixedCase()
+                            ->numbers()
+                            ->symbols(),
+                    ],
+
+                    'new_password_confirmation' => [
+                        'required',
+                    ],
+                ], [
+                    'current_password.current_password' => 'Mật khẩu hiện tại không đúng.',
+
+                    'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
+                    'new_password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+
+                    'new_password_confirmation.required' => 'Vui lòng nhập xác nhận mật khẩu.',
+                ]);
+
+                //check password hiện tại:
+                if (!Hash::check($request->current_password, Auth::user()->password)) {
+                    return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng']);
+                }
+
+                Auth::logoutOtherDevices($request->current_password);
+                Auth::user()->update([
+                    'password' => Hash::make($request->new_password)
+                ]);
+
+                return back()->with(
+                    'success',
+                    'Đổi mật khẩu thành công'
+                );
+            })->name('admin.users.change-password');
+
+            Route::get('users/sessions/{id}/delete',function(Request $request){
+
+                if(session()->getId()===$request->id){
+                     return back()->with('message', 'Không thể xoá session hiện tại đang dùng.');
+                }
+                $sessions = DB::table('sessions')->where("id",$request->id)->where("user_id",$request->user()->id);
+                //dd($sessions);
+                $check = false;
+                if($sessions->exists()){
+                    $sessions->delete();
+                    $check = true;
+                }
+                $success = $check?"Xoá thành công":"xoá không thành công";
+
+                return back()->with('success', $success);
+
+            });
+             //end profile
 
      //   });
 
@@ -409,3 +506,4 @@ Route::middleware(['auth', 'admin_view'])
             })->middleware('permission:manage posts');
         });
     });
+

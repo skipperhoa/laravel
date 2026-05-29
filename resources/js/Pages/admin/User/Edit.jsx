@@ -17,7 +17,7 @@ export default function Edit({ user, roles, permissions, dataRolePermission }) {
         e.preventDefault();
         console.log(data)
 
-        put(`/admin/users/${user.id}`);
+       // put(`/admin/users/${user.id}`);
     };
 
     return (

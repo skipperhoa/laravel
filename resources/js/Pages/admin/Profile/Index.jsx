@@ -1,7 +1,9 @@
 import React from "react";
-
+import ChangePassword from "./ChangePassword";
+import { usePage ,router} from "@inertiajs/react";
 export default function Index({ user}) {
     console.log("User:", user);
+    const {success, message} = usePage().props.flash;
 
     const sessions = [
         {
@@ -23,6 +25,10 @@ export default function Index({ user}) {
             time: "2026-05-24 22:41",
         },
     ];
+
+    const removeSessionId =(id)=>{
+        router.get(`/admin/users/sessions/${id}/delete`)
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 p-6">
@@ -100,61 +106,20 @@ export default function Index({ user}) {
                 </div>
 
                 {/* CHANGE PASSWORD */}
-                <div className="rounded-2xl bg-white p-6 shadow-sm">
-                    <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-gray-800">
-                            Change Password
-                        </h2>
+                <ChangePassword success={success}/>
 
-                        <p className="mt-1 text-sm text-gray-500">
-                            Update your account password.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Current Password
-                            </label>
-
-                            <input
-                                type="password"
-                                placeholder="Current password"
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
-                            />
+                {success && (
+                        <div className="mt-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-700">
+                            {success}
                         </div>
-
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                New Password
-                            </label>
-
-                            <input
-                                type="password"
-                                placeholder="New password"
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
-                            />
+                    )}
+                     {message && (
+                        <div className="mt-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700">
+                            {message}
                         </div>
+                    )}
 
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Confirm Password
-                            </label>
 
-                            <input
-                                type="password"
-                                placeholder="Confirm password"
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="mt-6">
-                        <button className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700">
-                            Change Password
-                        </button>
-                    </div>
-                </div>
 
                 {/* LOGIN HISTORY */}
                 <div className="rounded-2xl bg-white p-6 shadow-sm">
@@ -183,7 +148,7 @@ export default function Index({ user}) {
                                     </th>
 
                                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                                        Token
+                                        ip
                                     </th>
 
                                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
@@ -197,10 +162,10 @@ export default function Index({ user}) {
                             </thead>
 
                             <tbody>
-                                {sessions.map((session) => (
+                                {user?.sessions.map((session) => (
                                     <tr
                                         key={session.id}
-                                        className="border-b border-gray-100 hover:bg-gray-50"
+                                        className={`border-b border-gray-100 hover:bg-gray-50 ${session.is_current_device?"bg-green-100":""}`}
                                     >
                                         <td className="px-4 py-4 text-sm text-gray-700">
                                             {session.id}
@@ -212,7 +177,7 @@ export default function Index({ user}) {
 
                                         <td className="px-4 py-4 text-sm text-gray-700">
                                             <span className="rounded-lg bg-gray-100 px-3 py-1 font-mono text-xs">
-                                                {session.token}
+                                                {session.ip_address}
                                             </span>
                                         </td>
 
@@ -220,11 +185,12 @@ export default function Index({ user}) {
                                             {session.time}
                                         </td>
 
-                                        <td className="px-4 py-4 text-center">
-                                            <button className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600">
+                                       <td className="px-4 py-4 text-center">
+                                            <button onClick={()=>removeSessionId(session.id)} className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600">
                                                 Remove
                                             </button>
                                         </td>
+
                                     </tr>
                                 ))}
                             </tbody>

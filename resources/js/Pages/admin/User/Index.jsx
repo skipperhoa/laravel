@@ -15,6 +15,11 @@ export default function User({ users }) {
                         <div className="text-sm">{flash.success}</div>
                     </div>
                 )}
+             {flash.error && (
+                     <div className="mb-4 p-2 rounded-lg bg-red-100">
+                        <div className="text-sm">{flash.error}</div>
+                    </div>
+                )}
             <div className="overflow-x-auto rounded-2xl shadow-lg border border-gray-200">
                  <Link href={`/admin/users/create`} className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white text-sm font-medium transition m-4 inline-block">
                                     Create User
