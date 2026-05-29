@@ -1,12 +1,21 @@
-import React from 'react'
+import React ,{useState, useEffect} from 'react'
 import { useForm } from '@inertiajs/react';
+import { FaRegEye , FaRegEyeSlash } from "react-icons/fa";
 export default function ChangePassword({success}) {
   const {data, setData, put, errors, processing} = useForm({
     current_password: '',
     new_password: '',
     new_password_confirmation: '',
   })
-  console.log(errors)
+const [eye,setEye] = useState({
+    current_password:true,
+    new_password:true,
+    new_password_confirmation:true
+})
+
+useEffect(()=>{
+    console.log(eye)
+},[eye])
   /*
   route('admin.users.change-password')
   phải cài plugin : https://github.com/tighten/ziggy
@@ -42,13 +51,21 @@ export default function ChangePassword({success}) {
                                 Current Password
                             </label>
 
-                            <input
-                                type="password"
+                         <div className="relative">
+                              <input
+                                type={eye.current_password?"password":"text"}
                                 placeholder="Current password"
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
                             />
+                             <span className='absolute top-4 right-4 h-full' onClick={()=>setEye({...eye,['current_password']:!eye.current_password})}>
+                                {
+                                    eye.current_password?<FaRegEyeSlash size={20} />: <FaRegEye size={20}/>
+                                }
+                             </span>
+                        </div>
+
                              {errors.current_password && (
                                 <p className="text-red-500 text-sm mt-1">{errors.current_password}</p>
                             )}
@@ -58,14 +75,20 @@ export default function ChangePassword({success}) {
                             <label className="mb-2 block text-sm font-medium text-gray-700">
                                 New Password
                             </label>
-
-                            <input
-                                type="password"
-                                placeholder="New password"
-                                value={data.new_password}
-                                onChange={(e) => setData('new_password', e.target.value)}
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={eye.new_password?"password":"text"}
+                                    placeholder="New password"
+                                    value={data.new_password}
+                                    onChange={(e) => setData('new_password', e.target.value)}
+                                    className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+                                />
+                                <span className='absolute top-4 right-4 h-full' onClick={()=>setEye({...eye,['new_password']:!eye.new_password})}>
+                                    {
+                                        eye.new_password?<FaRegEyeSlash size={20} />: <FaRegEye size={20}/>
+                                    }
+                                </span>
+                            </div>
                              {errors.new_password && (
                                 <p className="text-red-500 text-sm mt-1">{errors.new_password}</p>
                             )}
@@ -76,13 +99,20 @@ export default function ChangePassword({success}) {
                                 Confirm Password
                             </label>
 
-                            <input
-                                type="password"
-                                value={data.new_password_confirmation}
-                                placeholder="Confirm password"
-                                onChange={(e) => setData('new_password_confirmation', e.target.value)}
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
-                            />
+                          <div className="relative">
+                                 <input
+                                         type={eye.new_password_confirmation?"password":"text"}
+                                        value={data.new_password_confirmation}
+                                        placeholder="Confirm password"
+                                        onChange={(e) => setData('new_password_confirmation', e.target.value)}
+                                        className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+                                    />
+                            <span className='absolute top-4 right-4 h-full' onClick={()=>setEye({...eye,['new_password_confirmation']:!eye.new_password_confirmation})}>
+                                    {
+                                        eye.new_password_confirmation?<FaRegEyeSlash size={20} />: <FaRegEye size={20}/>
+                                    }
+                                </span>
+                            </div>
                             {errors.new_password_confirmation && (
                                 <p className="text-red-500 text-sm mt-1">{errors.new_password_confirmation}</p>
                             )}

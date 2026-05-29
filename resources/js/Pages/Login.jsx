@@ -1,6 +1,7 @@
 import React,{ useState, useEffect} from 'react'
 import { Link, router, useForm, usePage, Form } from "@inertiajs/react";
 import AlertModal from "../components/ui/modal/alert-modal"
+import { FaRegEye , FaRegEyeSlash } from "react-icons/fa";
 // const csrf_token = document.cookie
 //     .split("; ")
 //     .find((r) => r.startsWith("XSRF-TOKEN="))
@@ -12,6 +13,7 @@ export default function Login() {
     const [open, setOpen] = useState(false)
     const [status,setStatus] = useState(false)
     const [message, setMessage] =  useState(null)
+    const [eye,setEye] = useState(true)
     const { data, setData, post, processing, errors } = useForm({
         email: "",
         password: "",
@@ -73,15 +75,22 @@ export default function Login() {
                             Password
                         </label>
 
-                        <input
-                            type="password"
-                            name="password"
-                            onChange={(e) =>
-                                setData("password", e.target.value)
-                            }
-                            placeholder="Enter your password"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        />
+                         <divc className="relative">
+                            <input
+                                type={eye?"password":"text"}
+                                name="password"
+                                onChange={(e) =>
+                                    setData("password", e.target.value)
+                                }
+                                placeholder="Enter your password"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            />
+                            <span className='absolute top-[3px] right-4 h-full' onClick={()=>setEye(!eye)}>
+                                 {
+                                    eye?<FaRegEyeSlash size={20} />: <FaRegEye size={20}/>
+                                 }
+                            </span>
+                         </divc>
                         {errors.password && (
                             <div className="text-red-500">
                                 {errors.password}
