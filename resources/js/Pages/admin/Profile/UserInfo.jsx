@@ -1,17 +1,59 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { usePage ,router, useForm} from "@inertiajs/react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 export default function UserInfo({user}) {
-   const {data, setData, post, errors, processing} = useForm({
-      avatar: user.avatar??"",
-      name: user.name??"",
-      email:  user.email??"",
+   const {id} = usePage().props.auth.user
+   const {data, setData, put, errors, processing} = useForm({
+      name:user.name,
       phone: user.phone??""
     })
-  const modifyUser = () =>{
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [preview, setPreview] = useState(null)
+  useEffect(()=>{
+       if(preview){
+          setData('avatar',selectedFile)
+       }
+  },[preview])
+  console.log("user info",errors)
+  const modifyUser = (e) =>{
     e.preventDefault();
     console.log(data)
+    put(`/admin/users/change-info/${id}/profile`,
+        {
+            transform: (data) => {
+                if (!selectedFile) {
+                    const { avatar, ...rest } = data;
+
+                    return rest;
+                }
+                return data;
+            }
+        })
   }
+  /* change avatar */
+    const onSelectFile = e => {
+
+        if (!e.target.files || e.target.files.length === 0) {
+            setSelectedFile(undefined)
+            return
+        }
+
+        setSelectedFile(e.target.files[0])
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            setPreview(reader.result)
+        }
+        if (e.target.files[0]) {
+            reader.readAsDataURL(e.target.files[0]);
+            setPreview(reader.result)
+        }
+        else {
+            setPreview(undefined)
+        }
+    }
+
+
   return (
     <form onSubmit={modifyUser}>
          <div className="rounded-2xl bg-white p-6 shadow-sm">
@@ -26,15 +68,18 @@ export default function UserInfo({user}) {
 
                     {/* Avatar */}
                     <div className="flex flex-col items-center">
-                        <img
-                            src={user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.name) + "&background=random&size=128"}
+
+                          <img
+                            src={selectedFile?preview:user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.name) + "&background=random&size=128"}
                             alt="avatar"
                             className="h-32 w-32 rounded-full border-4 border-gray-200 object-cover"
                         />
 
-                        <button className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700">
-                            Change Avatar
-                        </button>
+
+                        <input type="file"  onChange={onSelectFile}  className="mt-4 max-w-[200px] rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700" />
+                         {errors.avatar && (
+                                <p className="text-red-500 text-sm mt-1">{errors.avatar}</p>
+                            )}
                     </div>
 
                     {/* User Info */}
@@ -47,33 +92,41 @@ export default function UserInfo({user}) {
                             <input
                                 type="text"
                                 defaultValue={user.name}
-
+                                onChange={(e)=>setData("name",e.target.value)}
                                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
                             />
+                              {errors.name && (
+                                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                            <label className="mb-2 block text-sm font-medium text-gray-700" >
                                 Email
                             </label>
 
                             <input
                                 type="email"
                                 defaultValue={user.email}
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
+                                className="w-full rounded-xl border border-gray-300 bg-gray-100 px-4 py-3 outline-none transition focus:border-blue-500"
+                                disabled
                             />
                         </div>
 
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
                                 Phone
-                            </label>    `           `
+                            </label>
 
                             <input
                                 type="text"
-                                defaultValue="0123456789"
+                                defaultValue={user?.phone || ""}
+                                onChange={(e)=>setData("phone",e.target.value)}
                                 className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500"
                             />
+                              {errors.phone && (
+                                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                            )}
                         </div>
 
                         <div>

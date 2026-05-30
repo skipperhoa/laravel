@@ -4,12 +4,20 @@ use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Database\Eloquent\Collection;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use PragmaRX\Google2FA\Google2FA;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 Route::middleware(['auth', 'admin_view','auth.session'])
     ->prefix('admin')
     ->group(function () {
@@ -410,18 +418,44 @@ Route::middleware(['auth', 'admin_view','auth.session'])
                 $sessions = $sessions->map(function ($session) {
                     $session->time = date('Y-m-d H:i',$session->last_activity);
                     $session->is_current_device =
-                        $session->id === session()->getId();
-
+                    $session->id === session()->getId();
                     return $session;
                 });
+
+                /* lấy 2FA từ user */
+                $secretKey=$base64_url_qrcode="";
+                if($user->two_factor_enabled){
+
+                    $google2fa = new Google2FA();
+                    $secretKey = $user->two_factor_secret;
+
+                    $qrCodeUrl = $google2fa->getQRCodeUrl(
+                        $request->user()->name,
+                        $request->user()->email,
+                        $secretKey
+                    );
+                    $renderer = new ImageRenderer(
+                        new RendererStyle(200),
+                        new SvgImageBackEnd()
+                    );
+                    $writer = new Writer($renderer);
+
+                    $qrcode_image = $writer->writeString($qrCodeUrl);
+                    $base64_url_qrcode = 'data:image/svg+xml;base64,' . base64_encode($qrcode_image);
+                }
+                /* end check 2FA */
+
                 return Inertia::render('Admin/Profile/Index', [
                     'user' => [
                         'name' => $user->name,
                         'avatar' => $user->avatar,
                         'email' => $user->email,
+                        'phone' => $user->phone,
                         'roles' => $user->roles->pluck('name'),
                         'permissions' => $user->getAllPermissions()->pluck('name'),
-                        'sessions' => $sessions
+                        'sessions' => $sessions,
+                        'secretKey'=>$secretKey,
+                        'base64_url_qrcode'=>$base64_url_qrcode
                     ],
 
                 ]);
@@ -491,6 +525,105 @@ Route::middleware(['auth', 'admin_view','auth.session'])
                 $success = $check?"Xoá thành công":"xoá không thành công";
 
                 return back()->with('success', $success);
+
+            });
+
+            Route::put('users/change-info/{id}/profile', function(Request $request){
+                /*
+                 package check phone : https://github.com/Propaganistas/Laravel-Phone
+                */
+                    $request->validate([
+                        'name' => ['required', 'max:100'],
+                        'avatar' => [
+                            'nullable',
+                            'file',
+                            'extensions:jpg,png',
+                            'max:512',
+                            Rule::dimensions()
+                                ->maxWidth(1000)
+                                ->maxHeight(500)
+                                ->ratio(3 / 2),
+                        ],
+                        'phone'=>[
+                             'nullable',
+                             'size:10'
+                        ]
+
+                    ], [
+                        'name.required' => 'Vui lòng nhập tên.',
+                        'avatar.file' => 'Tệp tải lên không hợp lệ.',
+                        'avatar.extensions' => 'Ảnh đại diện chỉ được phép có định dạng JPG hoặc PNG.',
+                        'avatar.max' => 'Dung lượng ảnh đại diện không được vượt quá 512 KB.',
+                        'avatar.size' => 'Dung lượng ảnh đại diện phải đúng 512 KB.',
+                        'avatar.dimensions' => 'Ảnh đại diện phải có tỷ lệ 3:2 và không vượt quá 1000x500 pixel.',
+                        'phone.size'=>'Số điện thoại không đúng, bắt buộc 10 số'
+                    ]);
+
+                    if($request->user()->id!=$request->id){
+                        return back()->with('message', 'Bạn cố lừa tôi à'.$request->id."-".$request->user()->id);
+                    }
+
+                    if ($request->hasFile('avatar')) {
+                        // $image = $request->file('avatar');
+                       // Storage::put('images/'.$username, $image);
+                         $path = $request->file('avatar')->store('images/avatar','public');
+                         $request->user()->avatar = $path;
+                       // $file = 'images/avatar/Af9m23D3RiyGtCrq3GQC1I4Psx0pT3hV8aTNUJRd.png';
+                       // $url = Storage::url($file);
+                      //  Storage::delete($file); //xóa file
+                    }
+                    $request->user()->name = $request->name;
+                    $request->user()->phone = $request->phone;
+                    $request->user()->save();
+                    return back()->with('success', 'Bạn đã cập nhật thành công!');
+
+            });
+
+            Route::post('users/generate-secret-key/create',function(Request $request){
+                $google2fa = new Google2FA();
+                $secretKey = $google2fa->generateSecretKey();
+
+                $qrCodeUrl = $google2fa->getQRCodeUrl(
+                    $request->user()->name,
+                    $request->user()->email,
+                    $secretKey
+                );
+                $renderer = new ImageRenderer(
+                    new RendererStyle(200),
+                    new SvgImageBackEnd()
+                );
+
+                $writer = new Writer($renderer);
+
+                $qrcode_image = $writer->writeString($qrCodeUrl);
+                $base64_url_qrcode = 'data:image/svg+xml;base64,' . base64_encode($qrcode_image);
+                return response()->json(['google2fa_url'=>$base64_url_qrcode,'secretKey'=>$secretKey]);
+            });
+            Route::post('users/two-factor-authentication/save',function(Request $request){
+
+                 if($request->user()){
+                    $request->user()->two_factor_secret = $request->secretKey;
+                    $request->user()->two_factor_enabled = true;
+
+
+
+                    $google2fa = new Google2FA();
+
+                    $valid = $google2fa->verifyKey(
+                        $request->secretKey,
+                        $request->validOtp
+                    );
+
+                    if(!$valid){
+                        return back()->with("message","xác thực không đúng");
+                    }
+
+                    $request->user()->save();
+
+                    return back()->with("success","User đã bật xác thực đăng nhập 2FA");
+
+                }
+                return back()->with("message","Không tồn tại user");
 
             });
              //end profile

@@ -2,6 +2,7 @@ import React from "react";
 import ChangePassword from "./ChangePassword";
 import { usePage ,router} from "@inertiajs/react";
 import UserInfo from './UserInfo'
+import Authenticator from "./Authenticator";
 export default function Index({ user}) {
     console.log("User:", user);
     const {success, message} = usePage().props.flash;
@@ -34,14 +35,7 @@ export default function Index({ user}) {
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <div className="mx-auto max-w-7xl space-y-6">
-
-                {/* PROFILE */}
-                <UserInfo user = {user} />
-
-                {/* CHANGE PASSWORD */}
-                <ChangePassword success={success}/>
-
-                {success && (
+                 {success && (
                         <div className="mt-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-700">
                             {success}
                         </div>
@@ -51,6 +45,17 @@ export default function Index({ user}) {
                             {message}
                         </div>
                     )}
+
+
+                {/* PROFILE */}
+                <UserInfo user = {user} />
+
+                {/* CHANGE PASSWORD */}
+                <ChangePassword success={success}/>
+
+                {/* Tạo secret_key */}
+                <Authenticator google2fa_url={user.base64_url_qrcode} secretKey={user.secretKey}/>
+
 
 
 
