@@ -454,6 +454,7 @@ Route::middleware(['auth', 'admin_view','auth.session'])
                         'roles' => $user->roles->pluck('name'),
                         'permissions' => $user->getAllPermissions()->pluck('name'),
                         'sessions' => $sessions,
+                        'two_factor_enabled'=>$user->two_factor_enabled,
                         'secretKey'=>$secretKey,
                         'base64_url_qrcode'=>$base64_url_qrcode
                     ],
@@ -527,7 +528,6 @@ Route::middleware(['auth', 'admin_view','auth.session'])
                 return back()->with('success', $success);
 
             });
-
             Route::put('users/change-info/{id}/profile', function(Request $request){
                 /*
                  package check phone : https://github.com/Propaganistas/Laravel-Phone
@@ -578,7 +578,6 @@ Route::middleware(['auth', 'admin_view','auth.session'])
                     return back()->with('success', 'Bạn đã cập nhật thành công!');
 
             });
-
             Route::post('users/generate-secret-key/create',function(Request $request){
                 $google2fa = new Google2FA();
                 $secretKey = $google2fa->generateSecretKey();
@@ -615,15 +614,28 @@ Route::middleware(['auth', 'admin_view','auth.session'])
                     );
 
                     if(!$valid){
-                        return back()->with("message","xác thực không đúng");
+                        return response()->json(['message'=>"xác thực không đúng"],200);
+
                     }
 
                     $request->user()->save();
-
-                    return back()->with("success","User đã bật xác thực đăng nhập 2FA");
+                    return response()->json(['message'=>"User đã bật xác thực đăng nhập 2FA"],200);
 
                 }
-                return back()->with("message","Không tồn tại user");
+
+                return response()->json(['message'=>"Không tồn tại user"],400);
+
+            });
+             Route::post('users/two-factor-authentication/disable',function(Request $request){
+
+                 if($request->user()){
+                    $request->user()->two_factor_secret = "";
+                    $request->user()->two_factor_enabled = false;
+                    $request->user()->save();
+                    return response()->json(['message'=>"User đã tắt xác thực đăng nhập 2FA"],200);
+                }
+
+                return response()->json(['message'=>"Không tồn tại user"],400);
 
             });
              //end profile

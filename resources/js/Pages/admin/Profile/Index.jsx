@@ -54,7 +54,7 @@ export default function Index({ user}) {
                 <ChangePassword success={success}/>
 
                 {/* Tạo secret_key */}
-                <Authenticator google2fa_url={user.base64_url_qrcode} secretKey={user.secretKey}/>
+                <Authenticator google2fa_url={user.base64_url_qrcode} secretKey={user.secretKey} two_factor_enabled={user.two_factor_enabled} />
 
 
 
